@@ -7,6 +7,7 @@ using TechTalk.SpecFlow;
 namespace APITesting.Steps
 {
     [Binding]
+
     public sealed class MspAwsApi
     {
         [Given(@"I have provided an endpoint (.*)")]
