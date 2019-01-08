@@ -29,10 +29,11 @@ namespace APITesting.Entities
         public string BaseUrl { get; set; }
         public string Resources { get; set; }
         public string Parameter { get; set; }
+        public string Headers { get; set; }
         public string DataModel { get; set; }
         public string Body { get; set; }
         public string ApiResponse { get; set; }
-        public string DataToValidate { get; set;}
+        public string DataToValidate { get; set; }
         public string Validation { get; set; }
     }
 }

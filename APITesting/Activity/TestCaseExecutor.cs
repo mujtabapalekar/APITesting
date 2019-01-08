@@ -17,7 +17,7 @@ namespace APITesting.Activity
         {
             Boolean isPass = true;
             var TestsToRun = DataAccess.DataAccess.GetTestCasesToExecute();
-            TestsToRun.Count();
+            //TestsToRun.Count();
             foreach(TestsToRunDetails tc in TestsToRun)
             {
                 isPass = true;
