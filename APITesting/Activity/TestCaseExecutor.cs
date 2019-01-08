@@ -20,26 +20,27 @@ namespace APITesting.Activity
             TestsToRun.Count();
             foreach(TestsToRunDetails tc in TestsToRun)
             {
+                isPass = true;
                 Reporter.oReport.CreateTest(tc.TcName);
                 var StepsToRun = DataAccess.DataAccess.GetStepsToExecute(tc.TcId);                
-                TestsToRun.Count();
+                //TestsToRun.Count();
                 foreach(TestStepDetails step in StepsToRun)
                 {
-                    Reporter.oReport.PassTest("Execution started for step <" + step.Action + ">");
+                    Reporter.oReport.PassTest("Execution started for step: " + step.Action.ToString());
                     if (!StepExecutor.ExecuteStep(step))
                     {
                         isPass = false;
-                        Reporter.oReport.FailTest("Test Failed at Step <" + step.Action + "> Exiting Test Case");
+                        Reporter.oReport.FailTest("Test Failed at Step " + step.Action.ToString() + " Exiting Test Case");
                         break;
                     }                    
                 }
                 if(isPass==true)
                 {
-                    Reporter.oReport.PassTest("Test <" + tc.TcName + "> executed successfully.");
+                    Reporter.oReport.PassTest("Test " + tc.TcName.ToString() + " executed successfully.");
                 }
                 else
                 {
-                    Reporter.oReport.PassTest("TC <" + tc.TcName + "> execution failed.");
+                    Reporter.oReport.FailTest("TC " + tc.TcName.ToString() + " execution failed.");
                 }
                 
             }

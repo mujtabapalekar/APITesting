@@ -9,17 +9,17 @@ namespace APITesting.Activity
         internal static Boolean ExecuteStep(TestStepDetails step)
         {
             Boolean isPass = true;
-            var testData = DataAccess.DataAccess.GetTestDataForStep(step.TcId).FirstOrDefault();         
+            var testData = DataAccess.DataAccess.GetTestDataForStep(step.Key).FirstOrDefault();         
             switch (testData.Action)
             {
                 case "RunAPIRequest":                    
-                    if(!Main.APICallExecutor.PostAWSMSPCreateCall())
+                    if(!Main.APICallExecutor.PostAWSMSPCreateCall(testData))
                     {
                         isPass = false;
                     }
                 break;
                 case "ValidateApiResponse":
-                    if (!Main.ResponseValidation.ValidateAttributeSet(testData.ApiResponse, testData.Validation))
+                    if (!Main.ResponseValidation.FetchDataAndValidateAttributeSet(testData.DataToValidate, testData.Validation))
                     {
                         isPass = false;
                     }

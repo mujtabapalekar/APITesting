@@ -12,7 +12,7 @@ namespace APITesting
         {
 
 
-            APITesting.Main.APICallExecutor.PostAWSMSPCreateCall();
+            //APITesting.Main.APICallExecutor.PostAWSMSPCreateCall();
 
         }
 
@@ -21,6 +21,19 @@ namespace APITesting
         {
             //Test comment
             TestCaseExecutor.ExecuteTests();
+
+        }
+
+        [TestMethod]
+        public void GetExcelData()
+        {
+            //string filePath = @"C://Workspace/Automation/Projects/APITesting/APITesting/DataAccess/TestData.xlsx";
+            string newPath = @"C://Workspace/Automation/Projects/APITesting/APITesting/DataAccess/TestData - Copy - Copy.xlsx";
+            //Test comment
+            //DataAccess.DataAccess.UpdateExcel();
+            DataAccess.DataAccess.UpdateExcelUsingNpoi("API Dummy Text",1,"ApiResponse");
+
+            //DataAccess.DataAccess.UpdateExcelUsingEpPlus(filePath,"asdads",2,3);
 
         }
     }

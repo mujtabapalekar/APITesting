@@ -1,5 +1,6 @@
 ﻿using APITesting.Process;
 using System;
+using System.Linq;
 
 namespace APITesting.Main
 {
@@ -45,6 +46,32 @@ namespace APITesting.Main
                 return false;
             }         
 
+        }
+
+        internal static bool FetchDataAndValidateAttributeSet(string dataToValidate, string validation)
+        {
+            bool isPass = true;
+            string responseToValidate="";
+            string[] fetchDataKeyVal = dataToValidate.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+            var testData = DataAccess.DataAccess.GetDataToValidateParam(fetchDataKeyVal[0]).FirstOrDefault();
+            switch (fetchDataKeyVal[1])
+            {
+                case "ApiResponse":
+                    responseToValidate = testData.ApiResponse;
+                    break;
+                default:
+                    break;
+            }
+
+
+            if (!ValidateAttributeSet(validation,responseToValidate))
+            {
+                isPass = false;
+                Reporting.Reporter.oReport.FailTest("Validation for API request failed. Expected data: " + validation + "\n Actual response: "+ responseToValidate);
+            }
+            Reporting.Reporter.oReport.PassTest("Validation for API request successful. Expected data: " + validation + "\n Actual response: "+responseToValidate);
+            return isPass;
+            
         }
 
         internal static bool ValidateAttributeSet(string expectedAttributeSet, string actualResponseContent)

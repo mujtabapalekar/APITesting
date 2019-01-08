@@ -16,6 +16,7 @@ using APITesting.DataAccess;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using APITesting.Process;
+using APITesting.Entities;
 
 namespace APITesting.Main
 {
@@ -78,12 +79,12 @@ namespace APITesting.Main
             IRestResponse response = client.Execute(request);
             Debug.WriteLine(response.StatusCode + ":    " + response.Content);
         }
-        public static Boolean PostAWSMSPCreateCall()
+        public static bool PostAWSMSPCreateCall(TestDataDetails userData1)
         {
             Boolean isPass = true;
             try
             {
-                var userData1 = DataAccess.DataAccess.GetTestData("TestDataSheetPath", "select * from [DataSet$] where RunFlag='{0}'").FirstOrDefault();
+                //var userData1 = DataAccess.DataAccess.GetTestData("TestDataSheetPath", "select * from [DataSet$] where RunFlag='{0}'").FirstOrDefault();
                 string avc;
                 string valueToFind;
                 //Call to dynamically build query based on parameters passed
@@ -91,16 +92,22 @@ namespace APITesting.Main
                 //string json = SimpleJson.SimpleJson.SerializeObject(dynamicReq);
 
                 var client = new RestClient();
-                client.BaseUrl = new Uri(userData1.BaseURL);
+                client.BaseUrl = new Uri(userData1.BaseUrl);
                 //client.Authenticator = new HttpBasicAuthenticator("username", "password");
                 var request = new RestRequest(Method.POST);
                 request.Resource = userData1.Resources;
-                request.AddHeader("Authorization", "osnAuth osnauth_x_application_id=6,  osnauth_x_source_id=14, osnauth_x_timestamp=1546400123, osnauth_x_signature=ODUyM2NkODY1ZmZmOTg4ZDVmZjA5OWRhMGUxNGU3ZWI0M2U1OWYxMzYzMTIyNjY4NzIxYmI3NjVlZjFlMjgwZA==");
+                request.AddHeader("Authorization", "osnAuth osnauth_x_application_id=6,  osnauth_x_source_id=14, osnauth_x_timestamp=1546933214, osnauth_x_signature=ZWRjMDk2ZTI0ODZiNTkzZGQ4OWI5ZDVkNjA1OTE1MDYwNTU1MTg0ZGE3ZDE5MjgxZWQ0MDA4YTRjOTU3YjYwMw==");
                 request.AddParameter("application/json", userData1.Body, ParameterType.RequestBody);
                 IRestResponse response = client.Execute(request);
                 avc = response.Content.ToString();
                 valueToFind = avc.Between("customerType\":\"", "\",");
                 Debug.WriteLine("Validating Respose body attributes... Params to check: " + userData1.Validation + "\n Response body: " + response.Content.ToString());
+                if (!DataAccess.DataAccess.UpdateExcelUsingNpoi(response.Content.ToString(), Int32.Parse(userData1.Key), "ApiResponse"))
+                    //DataAccess.DataAccess.UpdateExcelUsingNpoi(response.Content.ToString(), Int32.Parse(userData1.Key), "ApiResponse");
+                {
+                    isPass = false;
+                };
+                Reporting.Reporter.oReport.PassTest("API Executed. Response: "+ response.Content.ToString());
                 //Moved to ResponseValidation class
                 //Assert.IsTrue(ResponseValidation.ValidateAttributeSet(userData1.Validation, response.Content.ToString()));
                 Debug.WriteLine((int)response.StatusCode + " : " + response.StatusCode + ":    " + response.Content);
@@ -155,7 +162,7 @@ namespace APITesting.Main
             //client.Authenticator = new HttpBasicAuthenticator("username", "password");
             var request = new RestRequest(Method.POST);
             request.Resource = "/Dev/create";
-            request.AddHeader("Authorization", "osnAuth osnauth_x_application_id=6,  osnauth_x_source_id=14, osnauth_x_timestamp=1545816699, osnauth_x_signature=YTRjMzZlMzBkYzNiNmFkZmM5MDFjZDBiMzQ4NTViNzkyY2Y3YTliYmJjMzVhY2I1OWMyZDcyZGZkNTAyMzc2YQ==");
+            request.AddHeader("Authorization", "osnAuth osnauth_x_application_id=6,  osnauth_x_source_id=14, osnauth_x_timestamp=1546887932, osnauth_x_signature=NDY3ODM3NmMwYzVkNGUyMDM1ZmYxMjc2NDVmYmFlMWI3ZWM5ODc1MTdkYzkwMTVmNDQ5MzBjMTA2ZTIyYWVjMw==");
             request.AddParameter("application/json", json, ParameterType.RequestBody);
             //SimpleJson.SimpleJson.
             IRestResponse response = client.Execute(request);

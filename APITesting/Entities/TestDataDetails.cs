@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace APITesting.Entities
 {
-    class UserData
+    public class UserData
     {
         public string Key { get; set; }
         public string TcName { get; set; }
@@ -20,7 +20,7 @@ namespace APITesting.Entities
 
     }
 
-    class TestDataDetails
+    public class TestDataDetails
     {
         public string Key { get; set; }
         public string TcId { get; set; }        
@@ -32,6 +32,7 @@ namespace APITesting.Entities
         public string DataModel { get; set; }
         public string Body { get; set; }
         public string ApiResponse { get; set; }
+        public string DataToValidate { get; set;}
         public string Validation { get; set; }
     }
 }
