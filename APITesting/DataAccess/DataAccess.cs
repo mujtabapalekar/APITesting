@@ -171,27 +171,6 @@ namespace APITesting.DataAccess
         }
 
 
-
-        public static void UpdateExcel()
-        {
-            XSSFWorkbook xssfwb;
-            using (FileStream file = new FileStream(@"C://Workspace/Automation/Projects/APITesting/APITesting/DataAccess/TestData.xlsx", FileMode.Open, FileAccess.Read))
-            {
-                xssfwb = new XSSFWorkbook(file);
-            }
-            ISheet sheet = xssfwb.GetSheet("DataSet");
-            IRow row = sheet.GetRow(1);
-            ICell cell = row.CreateCell(17);
-            //Debug.WriteLine("Cell data is: " + row.GetCell(1).ToString());
-           cell.SetCellValue("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-            using (FileStream file = new FileStream(@"C://Workspace/Automation/Projects/APITesting/APITesting/DataAccess/TestData.xlsx", FileMode.OpenOrCreate, FileAccess.Write))
-            {
-                xssfwb.Write(file);
-                file.Close();
-            }
-
-        }
-
         public static Boolean UpdateExcelUsingNpoi(string inputText, int row, string columnName)
         {
             Boolean isPass = true;
@@ -230,11 +209,6 @@ namespace APITesting.DataAccess
                 IRow rowToUpdate = sheet.GetRow(row) ?? sheet.CreateRow(row);
                 ICell colToUpdate = rowToUpdate.GetCell(colNoToUpdate) ?? rowToUpdate.CreateCell(colNoToUpdate);
                 colToUpdate.SetCellValue(inputText);
-                /*
-                IRow r = sheet.GetRow(1) ?? sheet.CreateRow(1);
-                ICell c = r.GetCell(2) ?? r.CreateCell(2);
-                c.SetCellValue("test2 new npoi soln");
-                */
                 // overwrite the workbook using a new stream
                 using (FileStream fs = new FileStream(excelPath, FileMode.Create, FileAccess.Write))
                 {
@@ -266,24 +240,7 @@ namespace APITesting.DataAccess
 
                 excelPackage.Save();
             }
-
-            /*
-            XSSFWorkbook xssfwb;
-            using (FileStream file = new FileStream(@"C://Workspace/Automation/Projects/APITesting/APITesting/DataAccess/TestData.xlsx", FileMode.Open, FileAccess.Read))
-            {
-                xssfwb = new XSSFWorkbook(file);
-            }
-            ISheet sheet = xssfwb.GetSheet("DataSet");
-            IRow row = sheet.GetRow(1);
-            ICell cell = row.CreateCell(17);
-            //Debug.WriteLine("Cell data is: " + row.GetCell(1).ToString());
-            cell.SetCellValue("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-            using (FileStream file = new FileStream(@"C://Workspace/Automation/Projects/APITesting/APITesting/DataAccess/TestData.xlsx", FileMode.OpenOrCreate, FileAccess.Write))
-            {
-                xssfwb.Write(file);
-                file.Close();
-            }
-            */
+            
         }
 
         public static Boolean UpdateApiResponseUsingAdapter(string key, string apiResponse)
@@ -368,42 +325,7 @@ namespace APITesting.DataAccess
                 adapter.RowUpdating += Adapter_RowUpdating;
                 adapter.RowUpdated += Adapter_RowUpdated;
                 adapter.Update(dataSet);
-                //adapter.RowUpdating += OnRowUpdating;
-                
-                /*
-                connection.Open();
-                OleDbCommand command = new OleDbCommand();
-                command.Connection = connection;
-                // command.CommandText = "Update [DataSet$] SET ApiResponse=? ";
-                //command.CommandText = string.Format("select * from [DataSet$] where RunFlag='{0}'", "Y");
-                command.CommandText = string.Format("Update [DataSet$] SET ApiResponse='{0}' WHERE Key={1}", apiResponse, key);
-                //  command.Parameters.AddWithValue("ApiResponse",apiResponse);
-                if (connection.State == ConnectionState.Open)
-                {
-                    try
-                    {
-                        command.ExecuteNonQuery();
-                        Reporting.Reporter.oReport.PassTest("Api Response<\n" + apiResponse + "\n> updated to record: " + key);
-
-                    }
-                    catch (Exception e)
-                    {
-                        isPass = false;
-                        Reporting.Reporter.oReport.PassTest("Failed to update Api Response with following error: " + e);
-
-                    }
-
-                }
-                
-                //var query = string.Format("Update [DataSet$] SET ApiResponse='"+apiResponse+"' where Key='"+key+"'");
-                //connection.Execute(query);
-                /*IEnumerable<TestDataDetails> values = connection.Query<TestDataDetails>(query, "Y");
-                foreach (TestDataDetails item in values)
-                {
-                    TestDataCollection.Add(item);
-                }
-                connection.Close();
-                */
+               
                 return isPass;
             }
         }
@@ -449,11 +371,5 @@ namespace APITesting.DataAccess
                 return userDataCollection;
             }
         }
-
-
-
-
-    
-
     }
 }

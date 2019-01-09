@@ -114,7 +114,7 @@ namespace APITesting.Main
                 {
                     isPass = false;
                 };
-                Reporting.Reporter.oReport.PassTest("API Executed. Response: "+ response.Content.ToString());
+                Reporting.Reporter.oReport.PassTest("API Executed.Request: "+ userData1.Body + " Response: "+ response.Content.ToString());
                 //Moved to ResponseValidation class
                 //Assert.IsTrue(ResponseValidation.ValidateAttributeSet(userData1.Validation, response.Content.ToString()));
                 Debug.WriteLine((int)response.StatusCode + " : " + response.StatusCode + ":    " + response.Content);

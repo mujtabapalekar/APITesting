@@ -51,7 +51,7 @@ namespace APITesting.Main
         internal static bool FetchDataAndValidateAttributeSet(string dataToValidate, string validation)
         {
             bool isPass = true;
-            string responseToValidate="";
+            string responseToValidate = "";
             string[] fetchDataKeyVal = dataToValidate.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
             var testData = DataAccess.DataAccess.GetDataToValidateParam(fetchDataKeyVal[0]).FirstOrDefault();
             switch (fetchDataKeyVal[1])
@@ -64,12 +64,14 @@ namespace APITesting.Main
             }
 
 
-            if (!ValidateAttributeSet(validation,responseToValidate))
+            if (!ValidateAttributeSet(validation, responseToValidate))
             {
                 isPass = false;
-                Reporting.Reporter.oReport.FailTest("Validation for API request failed. Expected data: " + validation + "\n Actual response: "+ responseToValidate);
+                Reporting.Reporter.oReport.FailTest("Validation for API request failed. Expected data: " + validation + "\n Actual response: " + responseToValidate);
             }
-            Reporting.Reporter.oReport.PassTest("Validation for API request successful. Expected data: " + validation + "\n Actual response: "+responseToValidate);
+            else {
+            Reporting.Reporter.oReport.PassTest("Validation for API request successful. Expected data: " + validation + "\n Actual response: " + responseToValidate);
+            }
             return isPass;
             
         }
