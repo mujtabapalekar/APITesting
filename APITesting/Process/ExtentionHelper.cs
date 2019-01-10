@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using APITesting.Entities;
 
 namespace APITesting.Process
 {
-    public static class ExtentionHelper
+    internal static class ExtentionHelper
     {
         public static string Between(this string src, string findfrom, string findto)
         {
@@ -28,5 +30,27 @@ namespace APITesting.Process
             return str;
         }
 
+        internal static int GetRowNumber(Collection<TestDataDetails> allRows, string TcId)
+        {
+            int comp = -1;
+            int rowNoOfExpectedData = 0;
+            foreach (TestDataDetails dataRow in allRows)
+            {
+                rowNoOfExpectedData++;
+                comp = string.Compare(TcId, dataRow.TcId);
+                if (comp == 0)
+                {
+                    return rowNoOfExpectedData;
+                }
+            }
+            if (comp == 0 && rowNoOfExpectedData > 0)
+            {
+                return rowNoOfExpectedData;
+            }
+            else
+            {
+                return -1;
+            }
+        }
     }
 }

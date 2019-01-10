@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Osn.Ott.Api.UI.Model.Subscription
 {
 
-    public class CreateRequest 
+    internal class CreateRequest 
     {
         public string UserId { get; set; }
         public string EmailAddress { get; set; }

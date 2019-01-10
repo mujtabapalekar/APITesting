@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using APITesting.Activity;
+using System.Collections.ObjectModel;
 
 namespace APITesting
 {
@@ -20,12 +21,12 @@ namespace APITesting
         public void GetTestCase()
         {
             //Test comment
-            TestCaseExecutor.ExecuteTests();
+            TestCaseExecutor.getInstance().ExecuteTests();
 
         }
 
         [TestMethod]
-        public void GetExcelData()
+        public void UpdateExcelData()
         {
             //string filePath = @"C://Workspace/Automation/Projects/APITesting/APITesting/DataAccess/TestData.xlsx";
             string newPath = @"C://Workspace/Automation/Projects/APITesting/APITesting/DataAccess/TestData - Copy - Copy.xlsx";
@@ -36,5 +37,17 @@ namespace APITesting
             //DataAccess.DataAccess.UpdateExcelUsingEpPlus(filePath,"asdads",2,3);
 
         }
+
+        [TestMethod]
+        public void TcToExecute()
+        {
+            
+            var TestsToRun = DataAccess.DataAccess.GetTestCasesToExecute();
+
+            
+            int var=TestsToRun.Count;
+        }
+
+        
     }
 }

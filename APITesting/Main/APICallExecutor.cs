@@ -17,69 +17,14 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using APITesting.Process;
 using APITesting.Entities;
+using APITesting.Activity;
 
 namespace APITesting.Main
 {
-    public static class APICallExecutor
+    public class APICallExecutor
     {
-
-        public static void MakeApiCall()
-        {
-
-            
-            //string json = JsonConvert.SerializeObject(tmp);
-            var client = new RestClient();
-            client.BaseUrl = new Uri("https://jsonplaceholder.typicode.com/posts");
-            //client.Authenticator = new HttpBasicAuthenticator("username", "password");
-            var request = new RestRequest("/2", Method.GET,DataFormat.Json);
-            //request.Resource = "statuses/friends_timeline.xml";
-            IRestResponse response = client.Execute(request);
-            Debug.WriteLine(response.StatusCode+ ":    " + response.Content);
-            Assert.AreEqual(200,(int)response.StatusCode,"Status code is not 200");
-        }
-
-        public static void MakeApiCreatePostCall()
-        {
-            object tmp = new
-            {
-                userid = 1,
-                title = "asddas",
-                bb = "asdda"
-            };
-            string json = SimpleJson.SimpleJson.SerializeObject(tmp);
-            var client = new RestClient();
-            client.BaseUrl = new Uri("https://jsonplaceholder.typicode.com/posts    ");
-            //client.Authenticator = new HttpBasicAuthenticator("username", "password");
-            var request = new RestRequest(Method.POST);
-            //request.Resource = "/2";
-            request.AddParameter("application/json", json, ParameterType.RequestBody);
-            //SimpleJson.SimpleJson.
-            IRestResponse response = client.Execute(request);
-            Debug.WriteLine(response.StatusCode + ":    " + response.Content);
-            Assert.AreEqual(201, (int)response.StatusCode, "Status code is not 201");
-        }
-
-        public static void MakeApiUpdatePutCall()
-        {
-            object tmp = new
-            {
-                id=2,
-                userid = 1,
-                title = "asddas",
-                bb = "asdda"
-            };
-            string json = SimpleJson.SimpleJson.SerializeObject(tmp);
-            var client = new RestClient();
-            client.BaseUrl = new Uri("https://jsonplaceholder.typicode.com/posts    ");
-            //client.Authenticator = new HttpBasicAuthenticator("username", "password");
-            var request = new RestRequest(Method.PUT);
-            request.Resource = "/2";
-            request.AddParameter("application/json", json, ParameterType.RequestBody);
-            //SimpleJson.SimpleJson.
-            IRestResponse response = client.Execute(request);
-            Debug.WriteLine(response.StatusCode + ":    " + response.Content);
-        }
-        public static bool PostAWSMSPCreateCall(TestDataDetails userData1)
+        
+        internal bool PostAWSMSPCreateCall(TestDataDetails userData1)
         {
             Boolean isPass = true;
             try
@@ -108,8 +53,16 @@ namespace APITesting.Main
                 IRestResponse response = client.Execute(request);
                 //avc = response.Content.ToString();
                 //valueToFind = avc.Between("customerType\":\"", "\",");
-                Debug.WriteLine("Validating Respose body attributes... Params to check: " + userData1.Validation + "\n Response body: " + response.Content.ToString());
-                if (!DataAccess.DataAccess.UpdateExcelUsingNpoi(response.Content.ToString(), Int32.Parse(userData1.Key), "ApiResponse"))
+                //Debug.WriteLine("Validating Respose body attributes... Params to check: " + userData1.Validation + "\n Response body: " + response.Content.ToString());
+
+                //Call to fetch row number of the Test step. We need this to write the response into the Excel sheet
+                int rowToUpdate=ExtentionHelper.GetRowNumber(TestCaseExecutor.getInstance().AllRows,userData1.TcId);
+                if (rowToUpdate < 0)
+                {
+                    isPass = false;
+                    Reporting.Reporter.oReport.FailTest("Unable to fetch row number for Test Step.");
+                }
+                if (!DataAccess.DataAccess.UpdateExcelUsingNpoi(response.Content.ToString(), rowToUpdate, "ApiResponse"))
                     //DataAccess.DataAccess.UpdateExcelUsingNpoi(response.Content.ToString(), Int32.Parse(userData1.Key), "ApiResponse");
                 {
                     isPass = false;
@@ -127,57 +80,7 @@ namespace APITesting.Main
             }
             return isPass;        
         }
-
-        public static void PostAWSMSPCreateCallBackup()
-        {
-            var userData1 = DataAccess.DataAccess.GetTestData("TestDataSheetPath", "select * from [DataSet$] where RunFlag='{0}'");
-            
-            Dictionary<string, string> oExtra = new Dictionary<string, string>();
-            oExtra.Add("MCC", "965");
-            oExtra.Add("MNC", "01");
-            oExtra.Add("Prod", "01");
-            CreateRequest newReq = new CreateRequest();
-            newReq.UserId = "00212029-ba97-468f-b670-b21eb2a93a8e";
-            newReq.EmailAddress = "info@osn.com";
-            newReq.MobileNumber = "96558880449033";
-            newReq.Packages = (new List<int>() { 3507 }).ToArray();
-            newReq.BirthDate = null;
-            newReq.Address = null;
-            newReq.Country = null;
-            newReq.City = null;
-            newReq.Gender = null;
-            newReq.CustomerUsernameID = null;
-            newReq.Password = "1234567890";
-            newReq.Name = null;
-            newReq.Title = null;
-            newReq.LanguagePreference = null;
-            newReq.Email2 = null;
-            newReq.Mobile2 = null;
-            newReq.Extra = oExtra;
-            //newReq.CreatedDate = DateTime.Now.Date;
-            //newReq.ExpiryDate = "2023-12-12T13:00:54.415093Z";
-            object tmp = new
-            {
-                userid = 1,
-                title = "asddas",
-                bb = "asdda"
-            };
-            string json = SimpleJson.SimpleJson.SerializeObject(newReq);
-            var client = new RestClient();
-            client.BaseUrl = new Uri("https://xf0lv66uc8.execute-api.eu-west-1.amazonaws.com");
-            //client.Authenticator = new HttpBasicAuthenticator("username", "password");
-            var request = new RestRequest(Method.POST);
-            request.Resource = "/Dev/create";
-            request.AddHeader("Authorization", "osnAuth osnauth_x_application_id=6,  osnauth_x_source_id=14, osnauth_x_timestamp=1546887932, osnauth_x_signature=NDY3ODM3NmMwYzVkNGUyMDM1ZmYxMjc2NDVmYmFlMWI3ZWM5ODc1MTdkYzkwMTVmNDQ5MzBjMTA2ZTIyYWVjMw==");
-            request.AddParameter("application/json", json, ParameterType.RequestBody);
-            //SimpleJson.SimpleJson.
-            IRestResponse response = client.Execute(request);
-
-            Debug.WriteLine((int)response.StatusCode + " : " + response.StatusCode + ":    " + response.Content);
-            Assert.AreEqual(200, (int)response.StatusCode, "Status code is not 201");
-
-        }
-
+        
 
 
     }

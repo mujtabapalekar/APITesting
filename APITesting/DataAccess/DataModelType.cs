@@ -8,7 +8,7 @@ namespace APITesting.DataAccess
 {
     class DataModelType
     {
-        public enum DataModelReturnType
+        internal enum DataModelReturnType
         {
             TestModule,
             TestsToRunDetails,
@@ -19,7 +19,7 @@ namespace APITesting.DataAccess
 
         }
 
-        public class DataTypeDefinition
+        internal class DataTypeDefinition
         {
             public DataModelReturnType Type { get; set; }
             public string Value { get; set; }

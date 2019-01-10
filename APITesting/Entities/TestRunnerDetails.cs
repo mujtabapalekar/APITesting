@@ -19,6 +19,11 @@ namespace APITesting.Entities
     {
         public string TcId { get; set; }
         public string TcName { get; set; }
+        public string primaryKey { get
+            {
+                string[] splitTcId = TcId.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries);
+                return splitTcId[0];
+            } }
         /*
         public string RunFlag { get; set; }
         public string TcName { get; set; }
@@ -39,13 +44,13 @@ namespace APITesting.Entities
         public string Parameter { get; set; }
         public string DataModel { get; set; }
         public string Body { get; set; }
-        public string Validation { get; set; }
+        public string fieldsToValidate { get; set; }
 
     }
 
     class TestStepDetails
     {
-        public string Key { get; set; }
+        //public string Key { get; set; }
         public string TcId { get; set; }
         public string RunFlag { get; set; }
         public string TcName { get; set; }

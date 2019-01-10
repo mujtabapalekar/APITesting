@@ -23,19 +23,19 @@ namespace APITesting.DataAccess
     class DataAccess
     {
 
-        public static string ExcelFileUpdateConnection(string excelFileEnvVar)
+        private static string ExcelFileUpdateConnection(string excelFileEnvVar)
         {
             var filePath = ConfigurationManager.AppSettings[excelFileEnvVar];
             var con = string.Format(@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source = {0}; Extended Properties='Excel 8.0;HDR=Yes;'", filePath);
             return con;
         }
-        public static string ExcelFileConnection(string excelFileEnvVar)
+        private static string ExcelFileConnection(string excelFileEnvVar)
         {
             var filePath = ConfigurationManager.AppSettings[excelFileEnvVar];
             var con = string.Format(@"Provider= Microsoft.ACE.OLEDB.12.0;Data Source = {0}; Extended Properties=Excel 12.0;", filePath);
             return con;
         }
-        public static Collection<UserData> GetTestData(string excelFileEnvVar, string query)
+        internal static Collection<UserData> GetTestData(string excelFileEnvVar, string query)
         {
             Collection<UserData> userDataCollection = new Collection<UserData>();
             using (var connection = new OleDbConnection(ExcelFileConnection(excelFileEnvVar)))
@@ -52,7 +52,7 @@ namespace APITesting.DataAccess
             }
         }
 
-        public static Collection<TestsToRunDetails> GetTestCasesToExecute()
+        internal static Collection<TestsToRunDetails> GetTestCasesToExecute()
         {
             string excelFileEnvVar = "TestDataSheetPath";
             Collection<TestsToRunDetails> TestCasesCollection = new Collection<TestsToRunDetails>();
@@ -62,7 +62,33 @@ namespace APITesting.DataAccess
 
                 var query = string.Format("select DISTINCT TcId,TcName from [DataSet$] where RunFlag='{0}'", "Y");
                 IEnumerable<TestsToRunDetails> values = connection.Query<TestsToRunDetails>(query, "Y");
+
+               // var distinct = values.Where(i=>values).Distinct();
+
                 foreach (TestsToRunDetails item in values)
+                {
+                    if (!TestCasesCollection.Select(i=>i.primaryKey).Contains(item.primaryKey))
+                    {
+                        TestCasesCollection.Add(item);
+                    }
+                }
+
+                //foreach()
+                connection.Close();
+                return TestCasesCollection;
+            }
+        }
+        internal static Collection<TestDataDetails> GetAllRows()
+        {
+            string excelFileEnvVar = "TestDataSheetPath";
+            Collection<TestDataDetails> TestCasesCollection = new Collection<TestDataDetails>();
+            using (var connection = new OleDbConnection(ExcelFileConnection(excelFileEnvVar)))
+            {
+                connection.Open();
+
+                var query = string.Format("select * from [DataSet$]");
+                IEnumerable<TestDataDetails> values = connection.Query<TestDataDetails>(query, "Y");
+                foreach (TestDataDetails item in values)
                 {
                     TestCasesCollection.Add(item);
                 }
@@ -70,8 +96,7 @@ namespace APITesting.DataAccess
                 return TestCasesCollection;
             }
         }
-
-        public static Collection<TestDataDetails> GetDataToValidateParam(string rowToCheck)
+        internal static Collection<TestDataDetails> GetDataToValidateParam(string rowToCheck)
         {
             string excelFileEnvVar = "TestDataSheetPath";
             Collection<TestDataDetails> TestDataCollection = new Collection<TestDataDetails>();
@@ -79,7 +104,7 @@ namespace APITesting.DataAccess
             {
                 connection.Open();
 
-                var query = string.Format("select * from [DataSet$] where Key={0}", rowToCheck);
+                var query = string.Format("select * from [DataSet$] where TcId='{0}'", rowToCheck);
                 IEnumerable<TestDataDetails> values = connection.Query<TestDataDetails>(query);
                 foreach (TestDataDetails item in values)
                 {
@@ -90,7 +115,7 @@ namespace APITesting.DataAccess
             }
         }
 
-        public static Collection<TestStepDetails> GetStepsToExecute(string tcId)
+        internal static Collection<TestStepDetails> GetStepsToExecute(string primaryKey)
         {
             string excelFileEnvVar = "TestDataSheetPath";
             Collection<TestStepDetails> TestStepsCollection = new Collection<TestStepDetails>();
@@ -98,7 +123,7 @@ namespace APITesting.DataAccess
             {
                 connection.Open();
 
-                var query = string.Format("select * from [DataSet$] where TcId='{0}'", tcId);
+                var query = string.Format("select * from [DataSet$] where TcId LIKE '{0}%'", primaryKey);
                 IEnumerable<TestStepDetails> values = connection.Query<TestStepDetails>(query, "Y");
                 foreach (TestStepDetails item in values)
                 {
@@ -109,7 +134,7 @@ namespace APITesting.DataAccess
             }
         }
 
-        public static Collection<TestDataDetails> GetTestDataForStep(string tcId)
+        internal static Collection<TestDataDetails> GetTestDataForStep(string tcId)
         {
             string excelFileEnvVar = "TestDataSheetPath";
             Collection<TestDataDetails> TestDataCollection = new Collection<TestDataDetails>();
@@ -117,7 +142,7 @@ namespace APITesting.DataAccess
             {
                 connection.Open();
 
-                var query = string.Format("select * from [DataSet$] where Key={0}", tcId);
+                var query = string.Format("select * from [DataSet$] where TcId='{0}'", tcId);
                 IEnumerable<TestDataDetails> values = connection.Query<TestDataDetails>(query, "Y");
                 foreach (TestDataDetails item in values)
                 {
@@ -128,7 +153,7 @@ namespace APITesting.DataAccess
             }
         }
 
-        public static Boolean UpdateApiResponse(string key, string apiResponse)
+        internal static Boolean UpdateApiResponse(string key, string apiResponse)
         {
             Boolean isPass = true;
             string excelFileEnvVar = "TestDataSheetPath";
@@ -171,7 +196,7 @@ namespace APITesting.DataAccess
         }
 
 
-        public static Boolean UpdateExcelUsingNpoi(string inputText, int row, string columnName)
+        internal static Boolean UpdateExcelUsingNpoi(string inputText, int row, string columnName)
         {
             Boolean isPass = true;
             string excelFileEnvVar = "TestDataSheetPath";
@@ -190,7 +215,7 @@ namespace APITesting.DataAccess
                 // make changes
                 ISheet sheet = wb.GetSheetAt(0);
 
-                for (int rowCntr = 0; rowCntr <= sheet.LastRowNum; row++)
+                for (int rowCntr = 0; rowCntr <= sheet.LastRowNum; rowCntr++)
                 {
                     IRow row1 = sheet.GetRow(rowCntr);
                     if (sheet.GetRow(rowCntr) != null)
@@ -225,7 +250,7 @@ namespace APITesting.DataAccess
         }
 
 
-        public static void UpdateExcelUsingEpPlus(string filePath, string value, int row, int col)
+        internal static void UpdateExcelUsingEpPlus(string filePath, string value, int row, int col)
         {
             //filePath = @"C://Workspace/Automation/Projects/APITesting/APITesting/DataAccess/TestData.xlsx";
             FileInfo file = new FileInfo(filePath);
@@ -240,10 +265,10 @@ namespace APITesting.DataAccess
 
                 excelPackage.Save();
             }
-            
+
         }
 
-        public static Boolean UpdateApiResponseUsingAdapter(string key, string apiResponse)
+        internal static Boolean UpdateApiResponseUsingAdapter(string key, string apiResponse)
         {
             Boolean isPass = true;
             string excelFileEnvVar = "TestDataSheetPath";
@@ -284,7 +309,7 @@ namespace APITesting.DataAccess
                 //adapter.UpdateCommand = new OleDbCommand(string.Format("Update [DataSet$] SET ApiResponse='{0}' WHERE Key={1}", apiResponse, key), connection);
                 adapter.UpdateCommand = new OleDbCommand("UPDATE [DataSet$] SET ApiResponse = ?" +
                                                        " WHERE Key = ?", connection);
-                adapter.UpdateCommand.Parameters.Add("@Key", OleDbType.Integer, 255).SourceColumn= "Key";
+                adapter.UpdateCommand.Parameters.Add("@Key", OleDbType.Integer, 255).SourceColumn = "Key";
                 adapter.UpdateCommand.Parameters.Add("@TcId", OleDbType.Char, 255).SourceColumn = "TcId";
                 adapter.UpdateCommand.Parameters.Add("@RunFlag", OleDbType.Char, 255).SourceColumn = "RunFlag";
                 adapter.UpdateCommand.Parameters.Add("@TcName", OleDbType.Char, 255).SourceColumn = "TcName";
@@ -299,9 +324,9 @@ namespace APITesting.DataAccess
                 adapter.UpdateCommand.Parameters.Add("@ApiResponse", OleDbType.Char, 512).SourceColumn = "ApiResponse";
                 adapter.UpdateCommand.Parameters.Add("@DataToValidate", OleDbType.Char, 255).SourceColumn = "DataToValidate";
                 adapter.UpdateCommand.Parameters.Add("@Validation", OleDbType.Char, 512).SourceColumn = "Validation";
-                
 
-                
+
+
                 adapter.UpdateCommand.Parameters.Add("@OldKey", OleDbType.Integer, 255, "Key").SourceVersion = DataRowVersion.Original;
                 adapter.UpdateCommand.Parameters.Add("@OldTcId", OleDbType.Char, 255, "TcId").SourceVersion = DataRowVersion.Original;
                 adapter.UpdateCommand.Parameters.Add("@OldRunFlag", OleDbType.Char, 255, "RunFlag").SourceVersion = DataRowVersion.Original;
@@ -325,14 +350,14 @@ namespace APITesting.DataAccess
                 adapter.RowUpdating += Adapter_RowUpdating;
                 adapter.RowUpdated += Adapter_RowUpdated;
                 adapter.Update(dataSet);
-               
+
                 return isPass;
             }
         }
 
         private static void Adapter_RowUpdated(object sender, OleDbRowUpdatedEventArgs e)
         {
-           // throw new NotImplementedException();
+            // throw new NotImplementedException();
         }
 
         private static void Adapter_RowUpdating(object sender, OleDbRowUpdatingEventArgs e)
@@ -340,11 +365,11 @@ namespace APITesting.DataAccess
             //throw new NotImplementedException();
         }
 
-        protected  void OnRowUpdating(System.Data.Common.RowUpdatingEventArgs value)
+        private void OnRowUpdating(System.Data.Common.RowUpdatingEventArgs value)
         {
 
         }
-        public static Collection<UserData> GetTestDataWithCommand(string excelFileEnvVar)
+        internal static Collection<UserData> GetTestDataWithCommand(string excelFileEnvVar)
         {
             Collection<UserData> userDataCollection = new Collection<UserData>();
             using (var connection = new OleDbConnection(ExcelFileConnection(excelFileEnvVar)))

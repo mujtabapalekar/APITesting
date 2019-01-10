@@ -8,23 +8,48 @@ using System.Threading.Tasks;
 using APITesting.Entities;
 using APITesting.Reporting;
 using NUnit.Framework;
+using System.Collections.ObjectModel;
 
 namespace APITesting.Activity
 {
-    public static class TestCaseExecutor
+    public class TestCaseExecutor
     {
-        public static void ExecuteTests()
+        public Collection<TestDataDetails> AllRows;
+
+        private static readonly object Locker = new object();
+        private TestCaseExecutor()
         {
+            AllRows = DataAccess.DataAccess.GetAllRows();
+        }
+
+        public static TestCaseExecutor getInstance()
+        {
+            lock (Locker)
+            {
+                if (DriverScript == null)
+                {
+                    DriverScript = new TestCaseExecutor();
+                }
+            }
+
+            return DriverScript;
+        }
+        private static TestCaseExecutor DriverScript = null;
+
+
+        public void ExecuteTests()
+        {
+    
             Boolean isPass = true;
             var TestsToRun = DataAccess.DataAccess.GetTestCasesToExecute();
             //TestsToRun.Count();
-            foreach(TestsToRunDetails tc in TestsToRun)
+            foreach (TestsToRunDetails tc in TestsToRun)
             {
                 isPass = true;
                 Reporter.oReport.CreateTest(tc.TcName);
-                var StepsToRun = DataAccess.DataAccess.GetStepsToExecute(tc.TcId);                
+                var StepsToRun = DataAccess.DataAccess.GetStepsToExecute(tc.primaryKey);
                 //TestsToRun.Count();
-                foreach(TestStepDetails step in StepsToRun)
+                foreach (TestStepDetails step in StepsToRun)
                 {
                     Reporter.oReport.PassTest("Execution started for step: " + step.Action.ToString());
                     if (!StepExecutor.ExecuteStep(step))
@@ -32,9 +57,9 @@ namespace APITesting.Activity
                         isPass = false;
                         Reporter.oReport.FailTest("Test Failed at Step " + step.Action.ToString() + " Exiting Test Case");
                         break;
-                    }                    
+                    }
                 }
-                if(isPass==true)
+                if (isPass == true)
                 {
                     Reporter.oReport.PassTest("Test " + tc.TcName.ToString() + " executed successfully.");
                 }
@@ -42,11 +67,11 @@ namespace APITesting.Activity
                 {
                     Reporter.oReport.FailTest("TC " + tc.TcName.ToString() + " execution failed.");
                 }
-                
+
             }
             Reporter.oReport.FlushReport();
         }
-        
+
 
     }
 }
