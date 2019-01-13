@@ -15,8 +15,8 @@ namespace APITesting.Activity
     public class TestCaseExecutor
     {
         public Collection<TestDataDetails> AllRows;
-
         private static readonly object Locker = new object();
+        private static TestCaseExecutor DriverScript = null;
         private TestCaseExecutor()
         {
             AllRows = DataAccess.DataAccess.GetAllRows();
@@ -34,7 +34,7 @@ namespace APITesting.Activity
 
             return DriverScript;
         }
-        private static TestCaseExecutor DriverScript = null;
+       
 
 
         public void ExecuteTests()
